@@ -245,7 +245,7 @@ export function VideoPlayerContainer({
   return (
     <Card>
       <CardContent className="p-6">
-        <div className="relative aspect-video overflow-hidden rounded-lg bg-black">
+        <div className="relative aspect-video overflow-hidden rounded-lg bg-black" data-video-container>
           {renderPlayer()}
 
           {/* Unified video controls for non-YouTube videos */}
