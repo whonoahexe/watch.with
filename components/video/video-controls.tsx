@@ -266,24 +266,24 @@ export function VideoControls({
           <div className="mb-4">
             <div
               ref={sliderRef}
-              className="seek-slider group relative h-2 cursor-pointer rounded-full bg-white/30"
+              className="seek-slider group relative h-2 cursor-pointer rounded-full bg-white/20 transition-all hover:bg-white/30"
               onMouseDown={handleSliderMouseDown}
             >
               {/* Progress bar */}
               <div
-                className="h-full rounded-full bg-white transition-all duration-100"
+                className="h-full rounded-full bg-primary shadow-sm transition-all duration-100"
                 style={{ width: `${progressPercentage}%` }}
               />
 
               {/* Slider handle */}
               <div
-                className="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-white opacity-0 transition-opacity group-hover:opacity-100"
+                className="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-2 border-white bg-primary opacity-0 shadow-lg transition-all hover:scale-110 group-hover:opacity-100"
                 style={{ left: `calc(${progressPercentage}% - 8px)` }}
               />
             </div>
 
             {/* Time display */}
-            <div className="mt-1 flex justify-between text-xs text-white/80">
+            <div className="mt-1 flex justify-between font-mono text-xs text-white/90">
               <span>{formatTime(currentTime)}</span>
               <span>{formatTime(duration)}</span>
             </div>
@@ -300,7 +300,7 @@ export function VideoControls({
                   variant="secondary"
                   size="sm"
                   onClick={handleSeekBackward}
-                  className="h-8 w-8 bg-black/70 p-0 text-white hover:bg-black/90"
+                  className="h-9 w-9 border border-white/20 bg-black/60 p-0 text-white transition-all duration-200 hover:border-primary/50 hover:bg-primary hover:text-primary-foreground"
                   title="Seek backward 10s"
                 >
                   <SkipBack className="h-4 w-4" />
@@ -310,17 +310,17 @@ export function VideoControls({
                   variant="secondary"
                   size="sm"
                   onClick={handlePlayPause}
-                  className="h-8 w-8 bg-black/70 p-0 text-white hover:bg-black/90"
+                  className="h-10 w-10 bg-primary p-0 text-primary-foreground shadow-lg transition-all duration-200 hover:scale-105 hover:bg-primary/80 hover:shadow-primary/25"
                   title={isPlaying ? 'Pause' : 'Play'}
                 >
-                  {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                  {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
                 </Button>
 
                 <Button
                   variant="secondary"
                   size="sm"
                   onClick={handleSeekForward}
-                  className="h-8 w-8 bg-black/70 p-0 text-white hover:bg-black/90"
+                  className="h-9 w-9 border border-white/20 bg-black/60 p-0 text-white transition-all duration-200 hover:border-primary/50 hover:bg-primary hover:text-primary-foreground"
                   title="Seek forward 10s"
                 >
                   <SkipForward className="h-4 w-4" />
@@ -335,7 +335,11 @@ export function VideoControls({
               variant="secondary"
               size="sm"
               onClick={handleMuteToggle}
-              className="h-8 w-8 bg-black/70 p-0 text-white hover:bg-black/90"
+              className={`h-9 w-9 border border-white/20 p-0 transition-all duration-200 ${
+                isMuted
+                  ? 'border-destructive/50 bg-destructive text-destructive-foreground hover:bg-destructive/80'
+                  : 'bg-black/60 text-white hover:border-primary/50 hover:bg-primary hover:text-primary-foreground'
+              }`}
               title={isMuted ? 'Unmute' : 'Mute'}
             >
               {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
@@ -345,7 +349,7 @@ export function VideoControls({
               variant="secondary"
               size="sm"
               onClick={handleFullscreen}
-              className="h-8 w-8 bg-black/70 p-0 text-white hover:bg-black/90"
+              className="h-9 w-9 border border-white/20 bg-black/60 p-0 text-white transition-all duration-200 hover:border-primary/50 hover:bg-primary hover:text-primary-foreground"
               title="Fullscreen"
             >
               <Maximize className="h-4 w-4" />
