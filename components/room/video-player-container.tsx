@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { YouTubePlayer, YouTubePlayerRef } from '@/components/video/youtube-player';
 import { VideoPlayer, VideoPlayerRef } from '@/components/video/video-player';
 import { HLSPlayer, HLSPlayerRef } from '@/components/video/hls-player';
-import { GuestVideoControls } from '@/components/video/guest-video-controls';
+import { VideoControls } from '@/components/video/video-controls';
 import { Video, ExternalLink, Edit3, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
@@ -225,9 +225,22 @@ export function VideoPlayerContainer({
         <div className="relative aspect-video overflow-hidden rounded-lg bg-black">
           {renderPlayer()}
 
-          {/* Guest controls for non-hosts (non-YouTube videos only) */}
-          {!isHost && videoType !== 'youtube' && (
-            <GuestVideoControls videoRef={getVideoElementRef()} className="z-20" />
+          {/* Unified video controls for non-YouTube videos */}
+          {videoType !== 'youtube' && (
+            <VideoControls
+              videoRef={getVideoElementRef()}
+              isHost={isHost}
+              isLoading={isLoading}
+              onPlay={onPlay}
+              onPause={onPause}
+              onSeek={time => {
+                // Only hosts can seek, so only call onSeeked for hosts
+                if (isHost) {
+                  onSeeked();
+                }
+              }}
+              className="z-20"
+            />
           )}
 
           {/* Block video controls for non-hosts on YouTube */}
