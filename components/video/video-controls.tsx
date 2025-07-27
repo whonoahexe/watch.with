@@ -224,12 +224,26 @@ export function VideoControls({
   };
   const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
 
+  const handleVideoClick = (e: React.MouseEvent) => {
+    // Only allow host to click to play/pause
+    if (!isHost) return;
+
+    // Prevent click if it's on a control button or slider
+    const target = e.target as HTMLElement;
+    if (target.closest('button') || target.closest('.seek-slider')) {
+      return;
+    }
+
+    handlePlayPause();
+  };
+
   return (
     <div
       className={`absolute inset-0 ${className}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onMouseEnter={showControlsWithAutoHide}
+      onClick={handleVideoClick}
     >
       {/* Loading indicator for guests */}
       {!isHost && isLoading && (
@@ -252,7 +266,7 @@ export function VideoControls({
           <div className="mb-4">
             <div
               ref={sliderRef}
-              className="group relative h-2 cursor-pointer rounded-full bg-white/30"
+              className="seek-slider group relative h-2 cursor-pointer rounded-full bg-white/30"
               onMouseDown={handleSliderMouseDown}
             >
               {/* Progress bar */}
