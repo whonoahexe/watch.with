@@ -31,7 +31,7 @@ export function SubtitleManager({
   onAddTracks,
   onRemoveTrack,
   onActiveTrackChange,
-  currentVideoTitle,
+  currentVideoTitle: _currentVideoTitle,
   isHost = false,
   isFullscreen = false,
 }: SubtitleManagerProps) {
@@ -170,8 +170,8 @@ function FullscreenSubtitleDropdown({
   onTrackSelect,
   onRemoveTrack,
   onUploadClick,
-  isHost,
-  isFullscreen,
+  isHost: _isHost,
+  isFullscreen: _isFullscreen,
 }: FullscreenSubtitleDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
 

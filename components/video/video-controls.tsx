@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Maximize, Volume2, VolumeX, Play, Pause, RotateCcw, RotateCw, Loader2, MessageCircle } from 'lucide-react';
 import { SubtitleManager } from './subtitle-manager';
@@ -69,6 +69,22 @@ export function VideoControls({
     hideControlsTimeoutRef.current = timeout;
   }, [onControlsVisibilityChange]);
 
+  const showControlsWithAutoHide = useCallback(() => {
+    setShowControls(true);
+    onControlsVisibilityChange?.(true);
+
+    // Clear existing timeout
+    if (hideControlsTimeoutRef.current) {
+      clearTimeout(hideControlsTimeoutRef.current);
+    }
+
+    // Auto-hide controls after 3 seconds of inactivity
+    hideControlsTimeoutRef.current = setTimeout(() => {
+      setShowControls(false);
+      onControlsVisibilityChange?.(false);
+    }, 3000);
+  }, [onControlsVisibilityChange]);
+
   // Handle fullscreen state changes
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -97,7 +113,7 @@ export function VideoControls({
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
       document.removeEventListener('msfullscreenchange', handleFullscreenChange);
     };
-  }, [isFullscreen, onFullscreenChange]); // Update video state
+  }, [isFullscreen, onFullscreenChange, showControlsWithAutoHide]); // Update video state
   useEffect(() => {
     const video = videoRef?.current;
     if (!video) return;
@@ -317,22 +333,6 @@ export function VideoControls({
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
-
-  const showControlsWithAutoHide = () => {
-    setShowControls(true);
-    onControlsVisibilityChange?.(true);
-
-    // Clear existing timeout
-    if (hideControlsTimeoutRef.current) {
-      clearTimeout(hideControlsTimeoutRef.current);
-    }
-
-    // Auto-hide controls after 3 seconds of inactivity
-    hideControlsTimeoutRef.current = setTimeout(() => {
-      setShowControls(false);
-      onControlsVisibilityChange?.(false);
-    }, 3000);
   };
 
   const handleMouseMove = () => {

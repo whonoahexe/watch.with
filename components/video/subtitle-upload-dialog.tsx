@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Upload, FileText, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Upload, FileText, CheckCircle, X } from 'lucide-react';
 import { SubtitleParser } from '@/lib/subtitle-utils';
 import type { SubtitleTrack } from '@/types/schemas';
 
@@ -250,7 +250,7 @@ export function SubtitleUploadDialog({ open, onOpenChange, onSubtitleSelected }:
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {processedTracks.map((track, index) => (
+                  {processedTracks.map((track, _index) => (
                     <div
                       key={track.id}
                       className="flex items-center justify-between rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20"
