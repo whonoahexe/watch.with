@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,6 +20,23 @@ export function SubtitleUploadDialog({ open, onOpenChange, onSubtitleSelected }:
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedTracks, setProcessedTracks] = useState<SubtitleTrack[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      // Get current scrollbar width
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      // Temporarily add padding to prevent layout shift
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    } else {
+      // Remove padding when modal closes
+      document.body.style.paddingRight = '';
+    }
+
+    return () => {
+      // Cleanup on unmount
+      document.body.style.paddingRight = '';
+    };
+  }, [open]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -143,15 +160,15 @@ export function SubtitleUploadDialog({ open, onOpenChange, onSubtitleSelected }:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[80vh] max-w-2xl flex-col overflow-hidden">
-        <DialogHeader>
+      <DialogContent className="fixed left-[50%] top-[50%] flex max-h-[85vh] w-[95vw] max-w-2xl translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden gap-0 p-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
+        <DialogHeader className="px-6 pb-4 pt-6">
           <DialogTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
             Upload Subtitle Files
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 space-y-6 overflow-y-auto">
+        <div className="flex-1 space-y-6 overflow-y-auto px-6">
           {/* Upload Area */}
           <Card>
             <CardHeader>
@@ -218,22 +235,6 @@ export function SubtitleUploadDialog({ open, onOpenChange, onSubtitleSelected }:
                     </div>
                   ))}
                 </div>
-
-                <div className="mt-4 border-t pt-4">
-                  <Button onClick={processFiles} disabled={isProcessing} className="w-full">
-                    {isProcessing ? (
-                      <>
-                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
-                        Processing Files...
-                      </>
-                    ) : (
-                      <>
-                        <FileText className="mr-2 h-4 w-4" />
-                        Process Subtitle Files
-                      </>
-                    )}
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           )}
@@ -274,16 +275,39 @@ export function SubtitleUploadDialog({ open, onOpenChange, onSubtitleSelected }:
                     </div>
                   ))}
                 </div>
-
-                <div className="mt-4 border-t pt-4">
-                  <Button onClick={handleAddSubtitles} className="w-full">
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Add Subtitles to Video
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           )}
+        </div>
+
+        {/* Bottom Actions */}
+        <div className="flex justify-between border-t bg-gray-50 p-6 pt-4 dark:bg-black">
+          <Button variant="outline" onClick={() => onOpenChange(false)} size="sm">
+            Cancel
+          </Button>
+          <div className="flex gap-2">
+            {uploadedFiles.length > 0 && processedTracks.length === 0 && (
+              <Button onClick={processFiles} disabled={isProcessing} size="sm">
+                {isProcessing ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Process Files
+                  </>
+                )}
+              </Button>
+            )}
+            {processedTracks.length > 0 && (
+              <Button onClick={handleAddSubtitles} size="sm">
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Add Subtitles
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
