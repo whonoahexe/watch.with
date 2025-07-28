@@ -47,6 +47,15 @@ export const TypingUserSchema = z.object({
   timestamp: z.number().positive(),
 });
 
+export const SubtitleTrackSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  language: z.string(),
+  url: z.string().url(),
+  format: z.enum(['vtt', 'srt', 'ass']),
+  isDefault: z.boolean().default(false),
+});
+
 export const RoomSchema = z.object({
   id: RoomIdSchema,
   hostId: z.string().uuid(),
@@ -56,6 +65,8 @@ export const RoomSchema = z.object({
   videoType: VideoTypeSchema,
   videoState: VideoStateSchema,
   users: z.array(UserSchema),
+  subtitleTracks: z.array(SubtitleTrackSchema).default([]),
+  activeSubtitleTrack: z.string().optional(),
   createdAt: z.date(),
 });
 
@@ -95,6 +106,12 @@ export const SyncCheckDataSchema = z.object({
   currentTime: z.number().min(0),
   isPlaying: z.boolean(),
   timestamp: z.number().positive(),
+});
+
+export const SetSubtitlesDataSchema = z.object({
+  roomId: RoomIdSchema,
+  subtitleTracks: z.array(SubtitleTrackSchema),
+  activeTrackId: z.string().optional(),
 });
 
 export const RoomActionDataSchema = z.object({
@@ -151,6 +168,11 @@ export const TypingEventResponseSchema = z.object({
   userName: UserNameSchema,
 });
 
+export const SubtitlesSetResponseSchema = z.object({
+  subtitleTracks: z.array(SubtitleTrackSchema),
+  activeTrackId: z.string().optional(),
+});
+
 export const ErrorResponseSchema = z.object({
   error: z.string().min(1),
 });
@@ -162,6 +184,7 @@ export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 export type TypingUser = z.infer<typeof TypingUserSchema>;
 export type VideoState = z.infer<typeof VideoStateSchema>;
 export type VideoType = z.infer<typeof VideoTypeSchema>;
+export type SubtitleTrack = z.infer<typeof SubtitleTrackSchema>;
 
 // Socket event data types
 export type CreateRoomData = z.infer<typeof CreateRoomDataSchema>;
@@ -171,6 +194,7 @@ export type VideoControlData = z.infer<typeof VideoControlDataSchema>;
 export type PromoteHostData = z.infer<typeof PromoteHostDataSchema>;
 export type SendMessageData = z.infer<typeof SendMessageDataSchema>;
 export type SyncCheckData = z.infer<typeof SyncCheckDataSchema>;
+export type SetSubtitlesData = z.infer<typeof SetSubtitlesDataSchema>;
 export type RoomActionData = z.infer<typeof RoomActionDataSchema>;
 
 // Response types
@@ -184,4 +208,5 @@ export type VideoEventResponse = z.infer<typeof VideoEventResponseSchema>;
 export type SyncUpdateResponse = z.infer<typeof SyncUpdateResponseSchema>;
 export type NewMessageResponse = z.infer<typeof NewMessageResponseSchema>;
 export type TypingEventResponse = z.infer<typeof TypingEventResponseSchema>;
+export type SubtitlesSetResponse = z.infer<typeof SubtitlesSetResponseSchema>;
 export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;

@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Maximize, Volume2, VolumeX, Play, Pause, RotateCcw, RotateCw, Loader2, MessageCircle } from 'lucide-react';
+import { SubtitleManager } from './subtitle-manager';
+import type { SubtitleTrack } from '@/types/schemas';
 
 interface VideoControlsProps {
   videoRef: React.RefObject<HTMLVideoElement> | null;
@@ -12,6 +14,12 @@ interface VideoControlsProps {
   onPause?: () => void;
   onSeek?: (time: number) => void;
   onShowChatOverlay?: () => void;
+  subtitleTracks?: SubtitleTrack[];
+  activeSubtitleTrack?: string;
+  onAddSubtitleTracks?: (tracks: SubtitleTrack[]) => void;
+  onRemoveSubtitleTrack?: (trackId: string) => void;
+  onActiveSubtitleTrackChange?: (trackId?: string) => void;
+  currentVideoTitle?: string;
   className?: string;
 }
 
@@ -23,6 +31,12 @@ export function VideoControls({
   onPause,
   onSeek,
   onShowChatOverlay,
+  subtitleTracks = [],
+  activeSubtitleTrack,
+  onAddSubtitleTracks,
+  onRemoveSubtitleTrack,
+  onActiveSubtitleTrackChange,
+  currentVideoTitle,
   className,
 }: VideoControlsProps) {
   const [isMuted, setIsMuted] = useState(false);
@@ -472,6 +486,19 @@ export function VideoControls({
                 <Volume2 className={isFullscreen ? 'h-5 w-5' : 'h-4 w-4'} />
               )}
             </Button>
+
+            {/* Subtitle Controls */}
+            {onAddSubtitleTracks && onActiveSubtitleTrackChange && (
+              <SubtitleManager
+                subtitleTracks={subtitleTracks}
+                activeTrackId={activeSubtitleTrack}
+                onAddTracks={onAddSubtitleTracks}
+                onRemoveTrack={onRemoveSubtitleTrack || (() => {})}
+                onActiveTrackChange={onActiveSubtitleTrackChange}
+                currentVideoTitle={currentVideoTitle}
+                isHost={isHost}
+              />
+            )}
 
             {/* Chat button - only show in fullscreen */}
             {isFullscreen && onShowChatOverlay && (

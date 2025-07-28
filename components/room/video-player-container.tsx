@@ -5,6 +5,7 @@ import { VideoPlayer, VideoPlayerRef } from '@/components/video/video-player';
 import { HLSPlayer, HLSPlayerRef } from '@/components/video/hls-player';
 import { VideoControls } from '@/components/video/video-controls';
 import { Video, ExternalLink, Edit3, AlertTriangle } from 'lucide-react';
+import type { SubtitleTrack } from '@/types/schemas';
 import {
   Dialog,
   DialogContent,
@@ -32,6 +33,12 @@ interface VideoPlayerContainerProps {
   onControlAttempt: () => void;
   onVideoChange?: (url: string) => void;
   onShowChatOverlay?: () => void;
+  subtitleTracks?: SubtitleTrack[];
+  activeSubtitleTrack?: string;
+  onAddSubtitleTracks?: (tracks: SubtitleTrack[]) => void;
+  onRemoveSubtitleTrack?: (trackId: string) => void;
+  onActiveSubtitleTrackChange?: (trackId?: string) => void;
+  currentVideoTitle?: string;
   youtubePlayerRef: React.RefObject<YouTubePlayerRef | null>;
   videoPlayerRef: React.RefObject<VideoPlayerRef | null>;
   hlsPlayerRef: React.RefObject<HLSPlayerRef | null>;
@@ -49,6 +56,12 @@ export function VideoPlayerContainer({
   onControlAttempt,
   onVideoChange,
   onShowChatOverlay,
+  subtitleTracks = [],
+  activeSubtitleTrack,
+  onAddSubtitleTracks,
+  onRemoveSubtitleTrack,
+  onActiveSubtitleTrackChange,
+  currentVideoTitle,
   youtubePlayerRef,
   videoPlayerRef,
   hlsPlayerRef,
@@ -239,6 +252,8 @@ export function VideoPlayerContainer({
             onPause={onPause}
             onSeeked={onSeeked}
             isHost={isHost}
+            subtitleTracks={subtitleTracks}
+            activeSubtitleTrack={activeSubtitleTrack}
             className="h-full w-full"
           />
         );
@@ -266,6 +281,12 @@ export function VideoPlayerContainer({
                 }
               }}
               onShowChatOverlay={onShowChatOverlay}
+              subtitleTracks={subtitleTracks}
+              activeSubtitleTrack={activeSubtitleTrack}
+              onAddSubtitleTracks={onAddSubtitleTracks}
+              onRemoveSubtitleTrack={onRemoveSubtitleTrack}
+              onActiveSubtitleTrackChange={onActiveSubtitleTrackChange}
+              currentVideoTitle={currentVideoTitle}
               className="z-20"
             />
           )}

@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSocket } from '@/hooks/use-socket';
 import { useRoom } from '@/hooks/use-room';
 import { useVideoSync } from '@/hooks/use-video-sync';
+import { useSubtitles } from '@/hooks/use-subtitles';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { YouTubePlayerRef } from '@/components/video/youtube-player';
 import { VideoPlayerRef } from '@/components/video/video-player';
@@ -52,6 +53,20 @@ export default function RoomPage() {
     copyRoomId,
     shareRoom,
   } = useRoom({ roomId });
+
+  // Use subtitle hook for subtitle management
+  const {
+    addSubtitleTracks,
+    removeSubtitleTrack,
+    setActiveSubtitleTrack,
+    updateSubtitleTracks,
+    updateSubtitleTracksAndActive,
+  } = useSubtitles({
+    roomId,
+    isHost: currentUser?.isHost || false,
+    currentSubtitleTracks: room?.subtitleTracks || [],
+    currentActiveTrack: room?.activeSubtitleTrack,
+  });
 
   // Use video sync hook for video synchronization
   const {
@@ -202,6 +217,12 @@ export default function RoomPage() {
               onControlAttempt={handleVideoControlAttempt}
               onVideoChange={handleSetVideo}
               onShowChatOverlay={showChatOverlayManually}
+              subtitleTracks={room.subtitleTracks || []}
+              activeSubtitleTrack={room.activeSubtitleTrack}
+              onAddSubtitleTracks={addSubtitleTracks}
+              onRemoveSubtitleTrack={removeSubtitleTrack}
+              onActiveSubtitleTrackChange={setActiveSubtitleTrack}
+              currentVideoTitle={undefined}
               youtubePlayerRef={youtubePlayerRef}
               videoPlayerRef={videoPlayerRef}
               hlsPlayerRef={hlsPlayerRef}

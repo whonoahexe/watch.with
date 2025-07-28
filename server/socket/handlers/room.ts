@@ -2,7 +2,14 @@ import { Socket, Server as IOServer } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import { redisService } from '@/server/redis';
 import { generateRoomId } from '@/lib/video-utils';
-import { Room, User, CreateRoomDataSchema, JoinRoomDataSchema, RoomActionDataSchema } from '@/types';
+import {
+  Room,
+  User,
+  CreateRoomDataSchema,
+  JoinRoomDataSchema,
+  RoomActionDataSchema,
+  SetSubtitlesDataSchema,
+} from '@/types';
 import { SocketEvents, SocketData } from '../types';
 import { validateData } from '../utils';
 
@@ -37,6 +44,7 @@ export function registerRoomHandlers(socket: Socket<SocketEvents, SocketEvents, 
           lastUpdateTime: Date.now(),
         },
         users: [user],
+        subtitleTracks: [],
         createdAt: new Date(),
       };
 
@@ -248,6 +256,57 @@ export function registerRoomHandlers(socket: Socket<SocketEvents, SocketEvents, 
       socket.emit('error', { error: 'Failed to promote user' });
     }
   });
+
+  // Set subtitles
+  socket.on('set-subtitles', async data => {
+    try {
+      const validatedData = validateData(SetSubtitlesDataSchema, data, socket);
+      if (!validatedData) return;
+
+      const { roomId, subtitleTracks, activeTrackId } = validatedData;
+
+      if (!socket.data.roomId || socket.data.roomId !== roomId) {
+        socket.emit('room-error', { error: 'Not in room' });
+        return;
+      }
+
+      const room = await redisService.rooms.getRoom(roomId);
+      if (!room) {
+        socket.emit('room-error', { error: 'Room not found' });
+        return;
+      }
+
+      // Check if user is host
+      const user = room.users.find(u => u.id === socket.data.userId);
+      if (!user?.isHost) {
+        socket.emit('room-error', { error: 'Only hosts can manage subtitles' });
+        return;
+      }
+
+      // Update room with new subtitle tracks
+      const updatedRoom = {
+        ...room,
+        subtitleTracks,
+        activeSubtitleTrack: activeTrackId,
+      };
+
+      await redisService.rooms.updateRoom(roomId, updatedRoom);
+
+      // Broadcast subtitle update to all users in the room
+      io.to(roomId).emit('subtitles-set', {
+        subtitleTracks,
+        activeTrackId,
+      });
+
+      console.log(`Subtitles updated in room ${roomId}:`, {
+        tracks: subtitleTracks.length,
+        activeTrack: activeTrackId,
+      });
+    } catch (error) {
+      console.error('Error setting subtitles:', error);
+      socket.emit('room-error', { error: 'Failed to set subtitles' });
+    }
+  });
 }
 
 export async function handleLeaveRoom(
@@ -305,4 +364,55 @@ export async function handleLeaveRoom(
   } catch (error) {
     console.error('Error leaving room:', error);
   }
+
+  // Set subtitles
+  socket.on('set-subtitles', async data => {
+    try {
+      const validatedData = validateData(SetSubtitlesDataSchema, data, socket);
+      if (!validatedData) return;
+
+      const { roomId, subtitleTracks, activeTrackId } = validatedData;
+
+      if (!socket.data.roomId || socket.data.roomId !== roomId) {
+        socket.emit('room-error', { error: 'Not in room' });
+        return;
+      }
+
+      const room = await redisService.rooms.getRoom(roomId);
+      if (!room) {
+        socket.emit('room-error', { error: 'Room not found' });
+        return;
+      }
+
+      // Check if user is host
+      const user = room.users.find(u => u.id === socket.data.userId);
+      if (!user?.isHost) {
+        socket.emit('room-error', { error: 'Only hosts can manage subtitles' });
+        return;
+      }
+
+      // Update room with new subtitle tracks
+      const updatedRoom = {
+        ...room,
+        subtitleTracks,
+        activeSubtitleTrack: activeTrackId,
+      };
+
+      await redisService.rooms.updateRoom(roomId, updatedRoom);
+
+      // Broadcast subtitle update to all users in the room
+      socket.to(roomId).emit('subtitles-set', {
+        subtitleTracks,
+        activeTrackId,
+      });
+
+      console.log(`Subtitles updated in room ${roomId}:`, {
+        tracks: subtitleTracks.length,
+        activeTrack: activeTrackId,
+      });
+    } catch (error) {
+      console.error('Error setting subtitles:', error);
+      socket.emit('room-error', { error: 'Failed to set subtitles' });
+    }
+  });
 }
