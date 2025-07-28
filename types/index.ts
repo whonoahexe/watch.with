@@ -10,7 +10,6 @@ import type {
   PromoteHostData,
   SendMessageData,
   SyncCheckData,
-  SetSubtitlesData,
   RoomActionData,
   RoomCreatedResponse,
   RoomJoinedResponse,
@@ -22,7 +21,6 @@ import type {
   SyncUpdateResponse,
   NewMessageResponse,
   TypingEventResponse,
-  SubtitlesSetResponse,
   ErrorResponse,
   VideoState,
 } from './schemas';
@@ -52,10 +50,6 @@ export interface SocketEvents {
   'video-seeked': (data: VideoEventResponse) => void;
   'sync-update': (data: SyncUpdateResponse) => void;
   'sync-video': (data: { videoState: VideoState }) => void;
-
-  // Subtitle events
-  'set-subtitles': (data: SetSubtitlesData) => void;
-  'subtitles-set': (data: SubtitlesSetResponse) => void;
 
   // Chat events
   'send-message': (data: SendMessageData) => void;

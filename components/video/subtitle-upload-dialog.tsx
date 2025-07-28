@@ -160,7 +160,7 @@ export function SubtitleUploadDialog({ open, onOpenChange, onSubtitleSelected }:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="fixed left-[50%] top-[50%] flex max-h-[85vh] w-[95vw] max-w-2xl translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden gap-0 p-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
+      <DialogContent className="fixed left-[50%] top-[50%] flex max-h-[85vh] w-[95vw] max-w-2xl translate-x-[-50%] translate-y-[-50%] flex-col gap-0 overflow-hidden p-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
         <DialogHeader className="px-6 pb-4 pt-6">
           <DialogTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />

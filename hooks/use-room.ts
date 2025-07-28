@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSocket } from '@/hooks/use-socket';
-import { Room, User, ChatMessage, TypingUser, SubtitleTrack } from '@/types';
+import { Room, User, ChatMessage, TypingUser } from '@/types';
 import { toast } from 'sonner';
 import { roomSessionStorage } from '@/lib/session-storage';
 
@@ -157,24 +157,6 @@ export function useRoom({ roomId }: UseRoomOptions): UseRoomReturn {
       }
     };
 
-    const handleSubtitlesSet = ({
-      subtitleTracks,
-      activeTrackId,
-    }: {
-      subtitleTracks: SubtitleTrack[];
-      activeTrackId?: string;
-    }) => {
-      setRoom(prev =>
-        prev
-          ? {
-              ...prev,
-              subtitleTracks,
-              activeSubtitleTrack: activeTrackId,
-            }
-          : null
-      );
-    };
-
     const handleNewMessage = ({ message }: { message: ChatMessage }) => {
       // Mark messages as read if they're from the current user, unread otherwise
       const messageWithReadStatus = {
@@ -251,7 +233,6 @@ export function useRoom({ roomId }: UseRoomOptions): UseRoomReturn {
     socket.on('user-left', handleUserLeft);
     socket.on('user-promoted', handleUserPromoted);
     socket.on('video-set', handleVideoSet);
-    socket.on('subtitles-set', handleSubtitlesSet);
     socket.on('new-message', handleNewMessage);
     socket.on('user-typing', handleUserTyping);
     socket.on('user-stopped-typing', handleUserStoppedTyping);
@@ -264,7 +245,6 @@ export function useRoom({ roomId }: UseRoomOptions): UseRoomReturn {
       socket.off('user-left', handleUserLeft);
       socket.off('user-promoted', handleUserPromoted);
       socket.off('video-set', handleVideoSet);
-      socket.off('subtitles-set', handleSubtitlesSet);
       socket.off('new-message', handleNewMessage);
       socket.off('user-typing', handleUserTyping);
       socket.off('user-stopped-typing', handleUserStoppedTyping);

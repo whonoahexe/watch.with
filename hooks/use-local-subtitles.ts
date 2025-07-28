@@ -3,32 +3,26 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { SubtitleTrack } from '@/types/schemas';
 
-interface UseSubtitlesOptions {
+interface UseLocalSubtitlesOptions {
   roomId: string;
   videoId?: string;
-  // Legacy props kept for compatibility (no longer used)
-  isHost?: boolean;
-  currentSubtitleTracks?: SubtitleTrack[];
-  currentActiveTrack?: string;
 }
 
-interface UseSubtitlesReturn {
-  // State
+interface UseLocalSubtitlesReturn {
   subtitleTracks: SubtitleTrack[];
   activeTrackId?: string;
   // Actions
   addSubtitleTracks: (newTracks: SubtitleTrack[]) => void;
   removeSubtitleTrack: (trackId: string) => void;
   setActiveSubtitleTrack: (trackId?: string) => void;
-  updateSubtitleTracks: (tracks: SubtitleTrack[]) => void;
-  updateSubtitleTracksAndActive: (tracks: SubtitleTrack[], activeTrackId?: string) => void;
+  clearAllSubtitleTracks: () => void;
 }
 
 /**
  * Hook for managing subtitles locally without socket synchronization.
  * Subtitles are stored per room/video combination in localStorage.
  */
-export function useSubtitles({ roomId, videoId }: UseSubtitlesOptions): UseSubtitlesReturn {
+export function useLocalSubtitles({ roomId, videoId }: UseLocalSubtitlesOptions): UseLocalSubtitlesReturn {
   const [subtitleTracks, setSubtitleTracks] = useState<SubtitleTrack[]>([]);
   const [activeTrackId, setActiveTrackId] = useState<string | undefined>();
 
@@ -117,7 +111,7 @@ export function useSubtitles({ roomId, videoId }: UseSubtitlesOptions): UseSubti
   );
 
   // Set the active subtitle track
-  const setActiveSubtitleTrack = useCallback(
+  const setActiveSubtitleTrackInternal = useCallback(
     (trackId?: string) => {
       setActiveTrackId(trackId);
       saveToStorage(subtitleTracks, trackId);
@@ -125,32 +119,24 @@ export function useSubtitles({ roomId, videoId }: UseSubtitlesOptions): UseSubti
     [subtitleTracks, saveToStorage]
   );
 
-  // Update subtitle tracks (for compatibility)
-  const updateSubtitleTracks = useCallback(
-    (tracks: SubtitleTrack[]) => {
-      setSubtitleTracks(tracks);
-      saveToStorage(tracks, activeTrackId);
-    },
-    [activeTrackId, saveToStorage]
-  );
-
-  // Update both tracks and active track in one operation
-  const updateSubtitleTracksAndActive = useCallback(
-    (tracks: SubtitleTrack[], newActiveTrackId?: string) => {
-      setSubtitleTracks(tracks);
-      setActiveTrackId(newActiveTrackId);
-      saveToStorage(tracks, newActiveTrackId);
-    },
-    [saveToStorage]
-  );
+  // Clear all subtitle tracks
+  const clearAllSubtitleTracks = useCallback(() => {
+    setSubtitleTracks([]);
+    setActiveTrackId(undefined);
+    try {
+      localStorage.removeItem(storageKey);
+      localStorage.removeItem(activeTrackKey);
+    } catch (error) {
+      console.error('Failed to clear subtitles from localStorage:', error);
+    }
+  }, [storageKey, activeTrackKey]);
 
   return {
     subtitleTracks,
     activeTrackId,
     addSubtitleTracks,
     removeSubtitleTrack,
-    setActiveSubtitleTrack,
-    updateSubtitleTracks,
-    updateSubtitleTracksAndActive,
+    setActiveSubtitleTrack: setActiveSubtitleTrackInternal,
+    clearAllSubtitleTracks,
   };
 }

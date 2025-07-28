@@ -118,42 +118,37 @@ export function SubtitleManager({
                     </div>
                   </div>
                 </DropdownMenuItem>
-                {isHost && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={e => {
-                      e.stopPropagation();
-                      handleRemoveTrack(track.id);
-                    }}
-                    className="h-6 w-6 flex-shrink-0 p-0 hover:bg-destructive hover:text-destructive-foreground"
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                )}
+                {/* Remove track button - now available to all users since subtitles are local */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={e => {
+                    e.stopPropagation();
+                    handleRemoveTrack(track.id);
+                  }}
+                  className="h-6 w-6 flex-shrink-0 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
               </div>
             ))}
 
-            {isHost && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleUploadClick} className="text-primary">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Upload Subtitles
-                </DropdownMenuItem>
-              </>
-            )}
+            {/* Upload subtitles - now available to all users since subtitles are local */}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleUploadClick} className="text-primary">
+              <Plus className="mr-2 h-4 w-4" />
+              Upload Subtitles
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )}
 
-      {isHost && (
-        <SubtitleUploadDialog
-          open={showSearchDialog}
-          onOpenChange={setShowSearchDialog}
-          onSubtitleSelected={handleAddSubtitles}
-        />
-      )}
+      {/* Subtitle upload dialog - now available to all users since subtitles are local */}
+      <SubtitleUploadDialog
+        open={showSearchDialog}
+        onOpenChange={setShowSearchDialog}
+        onSubtitleSelected={handleAddSubtitles}
+      />
     </>
   );
 }
@@ -224,34 +219,30 @@ function FullscreenSubtitleDropdown({
               </div>
             </div>
           </div>
-          {isHost && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={e => {
-                e.stopPropagation();
-                onRemoveTrack(track.id);
-              }}
-              className="h-6 w-6 flex-shrink-0 p-0 hover:bg-destructive hover:text-destructive-foreground"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          )}
+          {/* Remove track button - now available to all users since subtitles are local */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={e => {
+              e.stopPropagation();
+              onRemoveTrack(track.id);
+            }}
+            className="h-6 w-6 flex-shrink-0 p-0 hover:bg-destructive hover:text-destructive-foreground"
+          >
+            <X className="h-3 w-3" />
+          </Button>
         </div>
       ))}
 
-      {isHost && (
-        <>
-          <div className="my-1 h-px bg-border" />
-          <div
-            className="cursor-pointer rounded-sm px-2 py-1.5 text-sm text-primary outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
-            onClick={onUploadClick}
-          >
-            <Plus className="mr-2 inline h-4 w-4" />
-            Upload Subtitles
-          </div>
-        </>
-      )}
+      {/* Upload subtitles - now available to all users since subtitles are local */}
+      <div className="my-1 h-px bg-border" />
+      <div
+        className="cursor-pointer rounded-sm px-2 py-1.5 text-sm text-primary outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
+        onClick={onUploadClick}
+      >
+        <Plus className="mr-2 inline h-4 w-4" />
+        Upload Subtitles
+      </div>
     </div>
   ) : null;
 

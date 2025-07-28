@@ -54,18 +54,41 @@ export default function RoomPage() {
     shareRoom,
   } = useRoom({ roomId });
 
-  // Use subtitle hook for subtitle management
+  // Helper function to extract video ID from URL for subtitle storage
+  const getVideoIdForStorage = (videoUrl?: string): string | undefined => {
+    if (!videoUrl) return undefined;
+
+    try {
+      const urlObj = new URL(videoUrl);
+
+      // YouTube URLs
+      if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
+        if (urlObj.hostname.includes('youtu.be')) {
+          return urlObj.pathname.slice(1);
+        } else if (urlObj.hostname.includes('youtube.com')) {
+          return urlObj.searchParams.get('v') || undefined;
+        }
+      }
+
+      // For other video types, use the full URL as the ID (hashed for localStorage key)
+      return btoa(videoUrl)
+        .replace(/[^a-zA-Z0-9]/g, '')
+        .substring(0, 16);
+    } catch {
+      return undefined;
+    }
+  };
+
+  // Use local subtitle hook for subtitle management (no socket sync)
   const {
+    subtitleTracks,
+    activeTrackId: activeSubtitleTrack,
     addSubtitleTracks,
     removeSubtitleTrack,
     setActiveSubtitleTrack,
-    updateSubtitleTracks,
-    updateSubtitleTracksAndActive,
   } = useSubtitles({
     roomId,
-    isHost: currentUser?.isHost || false,
-    currentSubtitleTracks: room?.subtitleTracks || [],
-    currentActiveTrack: room?.activeSubtitleTrack,
+    videoId: getVideoIdForStorage(room?.videoUrl),
   });
 
   // Use video sync hook for video synchronization
@@ -217,8 +240,8 @@ export default function RoomPage() {
               onControlAttempt={handleVideoControlAttempt}
               onVideoChange={handleSetVideo}
               onShowChatOverlay={showChatOverlayManually}
-              subtitleTracks={room.subtitleTracks || []}
-              activeSubtitleTrack={room.activeSubtitleTrack}
+              subtitleTracks={subtitleTracks}
+              activeSubtitleTrack={activeSubtitleTrack}
               onAddSubtitleTracks={addSubtitleTracks}
               onRemoveSubtitleTrack={removeSubtitleTrack}
               onActiveSubtitleTrackChange={setActiveSubtitleTrack}
