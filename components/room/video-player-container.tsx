@@ -4,6 +4,7 @@ import { YouTubePlayer, YouTubePlayerRef } from '@/components/video/youtube-play
 import { VideoPlayer, VideoPlayerRef } from '@/components/video/video-player';
 import { HLSPlayer, HLSPlayerRef } from '@/components/video/hls-player';
 import { VideoControls } from '@/components/video/video-controls';
+import { SubtitleOverlay } from '@/components/video/subtitle-overlay';
 import { Video, ExternalLink, Edit3, AlertTriangle } from 'lucide-react';
 import type { SubtitleTrack } from '@/types/schemas';
 import {
@@ -73,6 +74,8 @@ export function VideoPlayerContainer({
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [pendingUrl, setPendingUrl] = useState('');
   const [videoRefReady, setVideoRefReady] = useState(false);
+  const [controlsVisible, setControlsVisible] = useState(true); // Start with controls visible
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Check if video ref is ready
   useEffect(() => {
@@ -263,8 +266,26 @@ export function VideoPlayerContainer({
   return (
     <Card>
       <CardContent className="p-6">
-        <div className="relative aspect-video overflow-hidden rounded-lg bg-black" data-video-container>
+        <div 
+          className={`relative aspect-video overflow-hidden rounded-lg bg-black ${
+            controlsVisible ? 'video-container-with-controls' : ''
+          } ${
+            isFullscreen ? 'video-container-fullscreen' : ''
+          }`} 
+          data-video-container
+        >
           {renderPlayer()}
+
+          {/* Custom subtitle overlay for non-YouTube videos */}
+          {videoType !== 'youtube' && (
+            <SubtitleOverlay
+              videoRef={getVideoElementRef()}
+              subtitleTracks={subtitleTracks}
+              activeSubtitleTrack={activeSubtitleTrack}
+              controlsVisible={controlsVisible}
+              isFullscreen={isFullscreen}
+            />
+          )}
 
           {/* Unified video controls for non-YouTube videos */}
           {videoType !== 'youtube' && videoRefReady && (
@@ -288,6 +309,8 @@ export function VideoPlayerContainer({
               onActiveSubtitleTrackChange={onActiveSubtitleTrackChange}
               currentVideoTitle={currentVideoTitle}
               className="z-20"
+              onControlsVisibilityChange={setControlsVisible}
+              onFullscreenChange={setIsFullscreen}
             />
           )}
 

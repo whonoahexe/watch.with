@@ -21,6 +21,8 @@ interface VideoControlsProps {
   onActiveSubtitleTrackChange?: (trackId?: string) => void;
   currentVideoTitle?: string;
   className?: string;
+  onControlsVisibilityChange?: (visible: boolean) => void;
+  onFullscreenChange?: (isFullscreen: boolean) => void;
 }
 
 export function VideoControls({
@@ -38,6 +40,8 @@ export function VideoControls({
   onActiveSubtitleTrackChange,
   currentVideoTitle,
   className,
+  onControlsVisibilityChange,
+  onFullscreenChange,
 }: VideoControlsProps) {
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -54,14 +58,16 @@ export function VideoControls({
   // Handle client-side hydration and initial control visibility
   useEffect(() => {
     setShowControls(true); // Ensure controls are visible after hydration
+    onControlsVisibilityChange?.(true); // Notify parent immediately
 
     // Start the auto-hide timer on mount
     const timeout = setTimeout(() => {
       setShowControls(false);
+      onControlsVisibilityChange?.(false);
     }, 4000); // Give a bit more time initially
 
     hideControlsTimeoutRef.current = timeout;
-  }, []);
+  }, [onControlsVisibilityChange]);
 
   // Handle fullscreen state changes
   useEffect(() => {
@@ -72,6 +78,9 @@ export function VideoControls({
         (document as Document & { msFullscreenElement?: Element }).msFullscreenElement
       );
       setIsFullscreen(isCurrentlyFullscreen);
+      
+      // Notify parent component about fullscreen change
+      onFullscreenChange?.(isCurrentlyFullscreen);
 
       // Show controls when entering/exiting fullscreen
       if (isCurrentlyFullscreen !== isFullscreen) {
@@ -88,7 +97,7 @@ export function VideoControls({
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
       document.removeEventListener('msfullscreenchange', handleFullscreenChange);
     };
-  }, [isFullscreen]); // Update video state
+  }, [isFullscreen, onFullscreenChange]); // Update video state
   useEffect(() => {
     const video = videoRef?.current;
     if (!video) return;
@@ -312,6 +321,7 @@ export function VideoControls({
 
   const showControlsWithAutoHide = () => {
     setShowControls(true);
+    onControlsVisibilityChange?.(true);
 
     // Clear existing timeout
     if (hideControlsTimeoutRef.current) {
@@ -321,6 +331,7 @@ export function VideoControls({
     // Auto-hide controls after 3 seconds of inactivity
     hideControlsTimeoutRef.current = setTimeout(() => {
       setShowControls(false);
+      onControlsVisibilityChange?.(false);
     }, 3000);
   };
 
@@ -334,6 +345,7 @@ export function VideoControls({
       clearTimeout(hideControlsTimeoutRef.current);
     }
     setShowControls(false);
+    onControlsVisibilityChange?.(false);
   };
   const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
 

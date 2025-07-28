@@ -250,8 +250,11 @@ a {
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
     padding: 0.2em 0.4em;
     border-radius: 2px;
-    line-height: 1.4;
+    line-height: 1.2;
     white-space: pre-line;
+    /* Hide native subtitles since we're using custom overlay */
+    opacity: 0 !important;
+    display: none !important;
   }
 
   video::cue(.large) {
