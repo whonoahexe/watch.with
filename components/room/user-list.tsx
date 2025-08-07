@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Crown, User } from 'lucide-react';
+import { Users, Crown, User, Mic, MicOff, VolumeX } from 'lucide-react';
 import { User as UserType } from '@/types';
 
 interface UserListProps {
@@ -70,6 +70,26 @@ export function UserList({ users, currentUserId, currentUserIsHost, onPromoteUse
                 <div className="mt-1 flex items-center space-x-1">
                   <User className="h-3 w-3 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">{user.isHost ? 'Host' : 'Guest'}</span>
+
+                  {/* Voice status indicators */}
+                  {user.voiceEnabled && (
+                    <div className="ml-2 flex items-center space-x-1">
+                      {user.isMuted ? (
+                        <div title="Muted">
+                          <MicOff className="h-3 w-3 text-destructive" />
+                        </div>
+                      ) : (
+                        <div title="Voice enabled">
+                          <Mic className="h-3 w-3 text-green-500" />
+                        </div>
+                      )}
+                      {user.isDeafened && (
+                        <div title="Deafened">
+                          <VolumeX className="h-3 w-3 text-destructive" />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 

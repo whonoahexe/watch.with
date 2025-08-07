@@ -1,6 +1,7 @@
 // list of feature flags
 export const FEATURE_FLAGS = {
   SUBTITLES_SUPPORT: true,
+  VOICE_CHAT: true,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAGS;

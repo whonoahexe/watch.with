@@ -22,6 +22,9 @@ export function registerRoomHandlers(socket: Socket<SocketEvents, SocketEvents, 
         name: hostName,
         isHost: true,
         joinedAt: new Date(),
+        voiceEnabled: false,
+        isMuted: false,
+        isDeafened: false,
       };
 
       const room: Room = {
@@ -38,6 +41,8 @@ export function registerRoomHandlers(socket: Socket<SocketEvents, SocketEvents, 
         },
         users: [user],
         createdAt: new Date(),
+        voiceChatEnabled: false,
+        maxVoiceUsers: 5,
       };
 
       await redisService.rooms.createRoom(room);
@@ -167,6 +172,9 @@ export function registerRoomHandlers(socket: Socket<SocketEvents, SocketEvents, 
         name: userName,
         isHost: isRoomHost,
         joinedAt: new Date(),
+        voiceEnabled: false,
+        isMuted: false,
+        isDeafened: false,
       };
 
       // If this is the host rejoining, update the room's hostId

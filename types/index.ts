@@ -11,6 +11,10 @@ import type {
   SendMessageData,
   SyncCheckData,
   RoomActionData,
+  VoiceChatToggle,
+  VoiceControl,
+  WebRTCSignaling,
+  VoiceUserUpdate,
   RoomCreatedResponse,
   RoomJoinedResponse,
   UserJoinedResponse,
@@ -59,6 +63,13 @@ export interface SocketEvents {
   'typing-stop': (data: RoomActionData) => void;
   'user-typing': (data: TypingEventResponse) => void;
   'user-stopped-typing': (data: UserLeftResponse) => void;
+
+  // Voice Chat events
+  'voice-chat-toggle': (data: VoiceChatToggle) => void;
+  'voice-chat-enabled': (data: { roomId: string; enabled: boolean }) => void;
+  'voice-control': (data: VoiceControl) => void;
+  'voice-user-update': (data: VoiceUserUpdate) => void;
+  'webrtc-signaling': (data: WebRTCSignaling) => void;
 
   // General events
   error: (data: ErrorResponse) => void;

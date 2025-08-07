@@ -29,6 +29,9 @@ export const UserSchema = z.object({
   name: UserNameSchema,
   isHost: z.boolean(),
   joinedAt: z.date(),
+  voiceEnabled: z.boolean().default(false),
+  isMuted: z.boolean().default(false),
+  isDeafened: z.boolean().default(false),
 });
 
 export const ChatMessageSchema = z.object({
@@ -66,6 +69,8 @@ export const RoomSchema = z.object({
   videoState: VideoStateSchema,
   users: z.array(UserSchema),
   createdAt: z.date(),
+  voiceChatEnabled: z.boolean().default(false),
+  maxVoiceUsers: z.number().min(2).max(5).default(5),
 });
 
 // Socket event schemas
@@ -164,6 +169,32 @@ export const ErrorResponseSchema = z.object({
   error: z.string().min(1),
 });
 
+// Voice Chat Schemas
+export const VoiceChatToggleSchema = z.object({
+  roomId: RoomIdSchema,
+  enabled: z.boolean(),
+});
+
+export const VoiceControlSchema = z.object({
+  roomId: RoomIdSchema,
+  action: z.enum(['mute', 'unmute', 'deafen', 'undeafen']),
+});
+
+export const WebRTCSignalingSchema = z.object({
+  roomId: RoomIdSchema,
+  targetUserId: z.string().uuid(),
+  type: z.enum(['offer', 'answer', 'ice-candidate']),
+  data: z.any(), // WebRTC offer/answer/ICE candidate data
+});
+
+export const VoiceUserUpdateSchema = z.object({
+  userId: z.string().uuid(),
+  userName: UserNameSchema,
+  voiceEnabled: z.boolean(),
+  isMuted: z.boolean(),
+  isDeafened: z.boolean(),
+});
+
 // Type inference from schemas
 export type User = z.infer<typeof UserSchema>;
 export type Room = z.infer<typeof RoomSchema>;
@@ -182,6 +213,12 @@ export type PromoteHostData = z.infer<typeof PromoteHostDataSchema>;
 export type SendMessageData = z.infer<typeof SendMessageDataSchema>;
 export type SyncCheckData = z.infer<typeof SyncCheckDataSchema>;
 export type RoomActionData = z.infer<typeof RoomActionDataSchema>;
+
+// Voice Chat types
+export type VoiceChatToggle = z.infer<typeof VoiceChatToggleSchema>;
+export type VoiceControl = z.infer<typeof VoiceControlSchema>;
+export type WebRTCSignaling = z.infer<typeof WebRTCSignalingSchema>;
+export type VoiceUserUpdate = z.infer<typeof VoiceUserUpdateSchema>;
 
 // Response types
 export type RoomCreatedResponse = z.infer<typeof RoomCreatedResponseSchema>;

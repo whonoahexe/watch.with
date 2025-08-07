@@ -7,6 +7,7 @@ import { useRoom } from '@/hooks/use-room';
 import { useVideoSync } from '@/hooks/use-video-sync';
 import { useSubtitles } from '@/hooks/use-subtitles';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { useVoiceChat } from '@/hooks/use-voice-chat';
 import { YouTubePlayerRef } from '@/components/video/youtube-player';
 import { VideoPlayerRef } from '@/components/video/video-player';
 import { HLSPlayerRef } from '@/components/video/hls-player';
@@ -18,8 +19,11 @@ import { RoomHeader } from '@/components/room/room-header';
 import { ErrorDisplay, LoadingDisplay, SyncError, GuestInfoBanner } from '@/components/room/room-status';
 import { VideoPlayerContainer } from '@/components/room/video-player-container';
 import { HostControlDialog } from '@/components/room/host-control-dialog';
+import { VoiceChatControls } from '@/components/room/voice-chat-controls';
+import { VoiceNotifications } from '@/components/room/voice-notifications';
 import { useFullscreenChatOverlay } from '@/hooks/use-fullscreen-chat-overlay';
 import { parseVideoUrl } from '@/lib/video-utils';
+import { isEnabled } from '@/lib/feature-flags';
 
 export default function RoomPage() {
   const params = useParams();
@@ -108,6 +112,24 @@ export default function RoomPage() {
     youtubePlayerRef,
     videoPlayerRef,
     hlsPlayerRef,
+  });
+
+  // Use voice chat hook for voice communication
+  const {
+    isVoiceEnabled,
+    isMuted,
+    isDeafened,
+    isConnecting,
+    voiceUsers,
+    needsAudioUnlock,
+    toggleVoiceChat,
+    toggleMute,
+    toggleDeafen,
+    unlockAudio,
+  } = useVoiceChat({
+    roomId,
+    userId: currentUser?.id || '',
+    isHost: currentUser?.isHost || false,
   });
 
   // Handle video control attempts by guests
@@ -269,6 +291,22 @@ export default function RoomPage() {
             onPromoteUser={handlePromoteUser}
           />
 
+          {isEnabled('VOICE_CHAT') && (
+            <VoiceChatControls
+              isVoiceEnabled={isVoiceEnabled}
+              isMuted={isMuted}
+              isDeafened={isDeafened}
+              isConnecting={isConnecting}
+              voiceUsers={voiceUsers}
+              needsAudioUnlock={needsAudioUnlock}
+              onToggleVoice={toggleVoiceChat}
+              onToggleMute={toggleMute}
+              onToggleDeafen={toggleDeafen}
+              onUnlockAudio={unlockAudio}
+              maxVoiceUsers={room.maxVoiceUsers || 5}
+            />
+          )}
+
           <Chat
             messages={messages}
             currentUserId={currentUser.id}
@@ -282,6 +320,9 @@ export default function RoomPage() {
 
       {/* Host Control Dialog */}
       <HostControlDialog open={showHostDialog} onOpenChange={setShowHostDialog} />
+
+      {/* Voice Chat Notifications */}
+      {isEnabled('VOICE_CHAT') && <VoiceNotifications voiceUsers={voiceUsers} currentUserId={currentUser.id} />}
 
       {/* Chat Overlay for Fullscreen */}
       {(() => {
