@@ -110,6 +110,25 @@ export const RoomActionDataSchema = z.object({
   roomId: RoomIdSchema,
 });
 
+// Voice signaling schemas
+export const VoiceOfferDataSchema = z.object({
+  roomId: RoomIdSchema,
+  targetUserId: z.string().uuid(),
+  sdp: z.any(),
+});
+
+export const VoiceAnswerDataSchema = z.object({
+  roomId: RoomIdSchema,
+  targetUserId: z.string().uuid(),
+  sdp: z.any(),
+});
+
+export const VoiceIceCandidateDataSchema = z.object({
+  roomId: RoomIdSchema,
+  targetUserId: z.string().uuid(),
+  candidate: z.any(),
+});
+
 // Response schemas
 export const RoomCreatedResponseSchema = z.object({
   roomId: RoomIdSchema,

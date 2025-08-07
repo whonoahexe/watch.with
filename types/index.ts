@@ -60,6 +60,17 @@ export interface SocketEvents {
   'user-typing': (data: TypingEventResponse) => void;
   'user-stopped-typing': (data: UserLeftResponse) => void;
 
+  // Voice signaling events
+  'voice-join': (data: RoomActionData) => void;
+  'voice-leave': (data: RoomActionData) => void;
+  'voice-participants': (data: { userIds: string[] }) => void;
+  'voice-peer-joined': (data: { userId: string }) => void;
+  'voice-peer-left': (data: { userId: string }) => void;
+  'voice-offer': (data: { fromUserId?: string; targetUserId: string; sdp: any; roomId?: string }) => void;
+  'voice-answer': (data: { fromUserId?: string; targetUserId: string; sdp: any; roomId?: string }) => void;
+  'voice-ice-candidate': (data: { fromUserId?: string; targetUserId: string; candidate: any; roomId?: string }) => void;
+  'voice-error': (data: ErrorResponse) => void;
+
   // General events
   error: (data: ErrorResponse) => void;
   disconnect: () => void;

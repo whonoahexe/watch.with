@@ -20,6 +20,9 @@ import { VideoPlayerContainer } from '@/components/room/video-player-container';
 import { HostControlDialog } from '@/components/room/host-control-dialog';
 import { useFullscreenChatOverlay } from '@/hooks/use-fullscreen-chat-overlay';
 import { parseVideoUrl } from '@/lib/video-utils';
+import { useVoiceChat } from '@/hooks/use-voice-chat';
+import { Button } from '@/components/ui/button';
+import { Mic, MicOff, Volume2 } from 'lucide-react';
 
 export default function RoomPage() {
   const params = useParams();
@@ -190,6 +193,20 @@ export default function RoomPage() {
     };
   }, [currentUser?.isHost, room?.videoUrl, startSyncCheck, stopSyncCheck]);
 
+  // Voice chat hook (must be before any conditional returns)
+  const {
+    enabled: voiceEnabled,
+    canEnable: canEnableVoice,
+    toggleEnabled: toggleVoice,
+    isMuted,
+    toggleMute,
+    peers: voicePeers,
+    error: voiceError,
+  } = useVoiceChat({
+    roomId,
+    currentUserId: currentUser?.id,
+  });
+
   // Handle errors
   if (error) {
     return <ErrorDisplay error={error} onRetry={() => router.push('/join')} />;
@@ -214,6 +231,24 @@ export default function RoomPage() {
         onCopyRoomId={copyRoomId}
         onShareRoom={shareRoom}
       />
+
+      {/* Voice chat controls */}
+      <div className="flex items-center gap-2">
+        <Button
+          size="sm"
+          variant={voiceEnabled ? 'default' : 'outline'}
+          onClick={toggleVoice}
+          disabled={!canEnableVoice}
+        >
+          {voiceEnabled ? <Volume2 className="mr-2 h-4 w-4" /> : <Volume2 className="mr-2 h-4 w-4" />}
+          {voiceEnabled ? 'Voice On' : 'Enable Voice'} ({voicePeers.length + (voiceEnabled ? 1 : 0)}/5)
+        </Button>
+        <Button size="sm" variant="outline" onClick={toggleMute} disabled={!voiceEnabled}>
+          {isMuted ? <MicOff className="mr-2 h-4 w-4" /> : <Mic className="mr-2 h-4 w-4" />}
+          {isMuted ? 'Unmute' : 'Mute'}
+        </Button>
+        {voiceError && <span className="text-sm text-destructive">{voiceError}</span>}
+      </div>
 
       {/* Sync Error */}
       {syncError && <SyncError error={syncError} />}

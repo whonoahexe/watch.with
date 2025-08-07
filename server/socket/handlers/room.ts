@@ -4,6 +4,7 @@ import { redisService } from '@/server/redis';
 import { generateRoomId } from '@/lib/video-utils';
 import { Room, User, CreateRoomDataSchema, JoinRoomDataSchema, RoomActionDataSchema } from '@/types';
 import { SocketEvents, SocketData } from '../types';
+import { roomIdToVoiceParticipants } from './voice';
 import { validateData } from '../utils';
 
 export function registerRoomHandlers(socket: Socket<SocketEvents, SocketEvents, object, SocketData>, io: IOServer) {
@@ -301,6 +302,11 @@ export async function handleLeaveRoom(
     }
 
     await socket.leave(roomId);
+    // Remove from voice if present
+    const voiceSet = roomIdToVoiceParticipants.get(roomId);
+    if (voiceSet && socket.data.userId && voiceSet.delete(socket.data.userId)) {
+      socket.to(roomId).emit('voice-peer-left', { userId: socket.data.userId });
+    }
     console.log(`${socket.data.userName || 'User'} left room ${roomId}`);
   } catch (error) {
     console.error('Error leaving room:', error);
